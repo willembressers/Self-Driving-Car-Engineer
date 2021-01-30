@@ -25,38 +25,41 @@ def abs_sobel_thresh(img, orient='x', thresh_min=0, thresh_max=255):
     # 5) Create a mask of 1's where the scaled gradient magnitude 
             # is > thresh_min and < thresh_max
     binary_output = np.zeros_like(scaled_sobel)
-    binary_output[(scaled_sobel >= thresh_min) & (scaled_sobel <= thresh_max)] = 1
+    binary_output[(scaled_sobel >= thresh_min) & (scaled_sobel <= thresh_max)] = 255
 
     # 6) Return this mask as your binary_output image
     return binary_output
 
 # define a window
-cv2.namedWindow('image')
+window_name = 'Apply Sobel'
+cv2.namedWindow(window_name)
 
 # Read the image
 img = cv2.imread('signs_vehicles_xygrad.png')
 
 # create trackbars for color change
-cv2.createTrackbar('thresh_min','image',0,255,nothing)
-cv2.createTrackbar('thresh_max','image',0,255,nothing)
+cv2.createTrackbar('thresh_min',window_name,0,255,nothing)
+cv2.createTrackbar('thresh_max',window_name,0,255,nothing)
 
 # # create switch for ON/OFF functionality
-# orient = 'orient : OFF \n1 : ON'
-# cv2.createTrackbar(orient, 'image',0,1,nothing)
+switch = '0 : x \n1 : y'
+cv2.createTrackbar(switch, window_name,0,1,nothing)
 
 while(1):
 
     # get current positions of our trackbars
-    thresh_min = cv2.getTrackbarPos('thresh_min','image')
-    thresh_max = cv2.getTrackbarPos('thresh_max','image')
+    thresh_min = cv2.getTrackbarPos('thresh_min',window_name)
+    thresh_max = cv2.getTrackbarPos('thresh_max',window_name)
+    orient = 'y' if cv2.getTrackbarPos(switch,window_name) == 1 else 'x'
 
     # Run the function
-    grad_binary = abs_sobel_thresh(img, orient='x', thresh_min=20, thresh_max=100)
+    grad_binary = abs_sobel_thresh(img, orient=orient, thresh_min=thresh_min, thresh_max=thresh_max)
 
-    cv2.imshow('image', grad_binary)
-    print('done')
+    # show the image
+    cv2.imshow(window_name, grad_binary)
 
-    k = cv2.waitKey(2000) & 0xFF
+    # wait 1 sec on keypress = (esc)
+    k = cv2.waitKey(1) & 0xFF
     if k == 27:
         break
 
