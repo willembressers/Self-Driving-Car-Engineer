@@ -37,20 +37,17 @@ cv2.namedWindow(window_name)
 # Read the image
 img = cv2.imread('signs_vehicles_xygrad.png')
 
-# create trackbars for color change
-cv2.createTrackbar('thresh_min',window_name,0,255,nothing)
-cv2.createTrackbar('thresh_max',window_name,0,255,nothing)
-
-# # create switch for ON/OFF functionality
-switch = '0 : x \n1 : y'
-cv2.createTrackbar(switch, window_name,0,1,nothing)
+# create trackbars
+cv2.createTrackbar('thresh_min', window_name, 0, 255, nothing)
+cv2.createTrackbar('thresh_max', window_name, 0, 255, nothing)
+cv2.createTrackbar('0 : x \n1 : y', window_name, 0, 1, nothing)
 
 while(1):
 
     # get current positions of our trackbars
-    thresh_min = cv2.getTrackbarPos('thresh_min',window_name)
-    thresh_max = cv2.getTrackbarPos('thresh_max',window_name)
-    orient = 'y' if cv2.getTrackbarPos(switch,window_name) == 1 else 'x'
+    thresh_min = cv2.getTrackbarPos('thresh_min', window_name)
+    thresh_max = cv2.getTrackbarPos('thresh_max', window_name)
+    orient = 'y' if cv2.getTrackbarPos('0 : x \n1 : y', window_name) == 1 else 'x'
 
     # Run the function
     grad_binary = abs_sobel_thresh(img, orient=orient, thresh_min=thresh_min, thresh_max=thresh_max)
