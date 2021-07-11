@@ -20,9 +20,8 @@ The highway's waypoints loop around so the frenet s value, distance along the ro
 ## Basic Build Instructions
 
 1. Clone this repo.
-2. Make a build directory: `mkdir build && cd build`
-3. Compile: `cmake .. && make`
-4. Run it: `./path_planning`.
+2. Make a build directory: `mkdir build` (only the first time)
+3. Compile & Run it: `./compile_and_run.sh`.
 
 Here is the data provided from the Simulator to the C++ Program
 
@@ -92,54 +91,66 @@ A really helpful resource for doing this project and creating smooth trajectorie
     git checkout e94b6e1
     ```
 
-## Editor Settings
+## Rubric points
 
-We've purposefully kept editor configuration files out of this repo in order to
-keep it as simple and environment agnostic as possible. However, we recommend
-using the following settings:
+### Compilation
 
-* indent using spaces
-* set tab width to 2 spaces (keeps the matrices in source code aligned)
+#### The code compiles correctly.
+Code must compile without errors with cmake and make.
 
-## Code Style
+Given that we've made CMakeLists.txt as general as possible, it's recommend that you do not change it unless you can guarantee that your changes will still compile on any platform.
 
-Please (do your best to) stick to [Google's C++ style guide](https://google.github.io/styleguide/cppguide.html).
+As show in the screenshot, the building and compilation din't gave any errors
+![Compile and run](./images/compile_and_run.png)
 
-## Project Instructions and Rubric
+### Valid Trajectories
 
-Note: regardless of the changes you make, your project must be buildable using
-cmake and make!
+#### The car is able to drive at least 4.32 miles without incident..
+The top right screen of the simulator shows the current/best miles driven without incident. Incidents include exceeding acceleration/jerk/speed, collision, and driving outside of the lanes. Each incident case is also listed below in more detail.
 
+Although we've had quite some traffic in front of use, and had no possibilities to pass. We've made it until 4.53 (and still going strong) without any accidents or any jerks.
+![Compile and run](./images/finish.png)
 
-## Call for IDE Profiles Pull Requests
+#### The car drives according to the speed limit.
+The car doesn't drive faster than the speed limit. Also the car isn't driving much slower than speed limit unless obstructed by traffic.
 
-Help your fellow students!
+I've hardcoded the max speed just below the speed limit.
+```c++
+// convert [mp/h -> m/s] = / 2.237
+  double max_speed = 49.5 / 2.237;
+  double speed_limit = 50 / 2.237;
+```
 
-We decided to create Makefiles with cmake to keep this project as platform
-agnostic as possible. Similarly, we omitted IDE profiles in order to ensure
-that students don't feel pressured to use one IDE or another.
+#### Max Acceleration and Jerk are not Exceeded.
+The car does not exceed a total acceleration of 10 m/s^2 and a jerk of 10 m/s^3.
 
-However! I'd love to help people get up and running with their IDEs of choice.
-If you've created a profile for an IDE that you think other students would
-appreciate, we'd love to have you add the requisite profile files and
-instructions to ide_profiles/. For example if you wanted to add a VS Code
-profile, you'd add:
+I'm not sure if accelerations and jerks are logged, but there were none during the ride.
 
-* /ide_profiles/vscode/.vscode
-* /ide_profiles/vscode/README.md
+#### Car does not have collisions.
+The car must not come into contact with any of the other cars on the road.
 
-The README should explain what the profile does, how to take advantage of it,
-and how to install it.
+I'm not sure if collisions are logged, but there were none during the ride.
 
-Frankly, I've never been involved in a project with multiple IDE profiles
-before. I believe the best way to handle this would be to keep them out of the
-repo root to avoid clutter. My expectation is that most profiles will include
-instructions to copy files to a new location to get picked up by the IDE, but
-that's just a guess.
+#### The car stays in its lane, except for the time between changing lanes.
+The car doesn't spend more than a 3 second length out side the lane lanes during changing lanes, and every other time the car stays inside one of the 3 lanes on the right hand side of the road.
 
-One last note here: regardless of the IDE used, every submitted project must
-still be compilable with cmake and make./
+it does.
 
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
+#### The car is able to change lanes
+The car is able to smoothly change lanes when it makes sense to do so, such as when behind a slower moving car and an adjacent lane is clear of other traffic.
 
+![Compile and run](./images/change_lanes.png)
+
+## Reflection
+#### There is a reflection on how to generate paths.
+
+The code model for generating paths is described in detail. This can be part of the README or a separate doc labeled "Model Documentation".
+
+The main code consist of 4 parts:
+
+1. **process sensory data**; in the first part, the car processes the sensory data it recieves. This parts analyses the sensory input and sets the appropriate flags (car in front, left lane available, etc).
+2. **behaviour**; in the behaviour part, the car makes a decision on it's actions. if it wants to adjust it's speed or change a lane
+3. **trajectory**; now that an decision is made, the car plans a trajectory for it's action. This means it determines it path it want to follow
+4. **path planner**; in the last part the desired trajectory is translated to an spline in real world coordinates so the car follows the lane (curvature) and doesn't jerk the car.
+
+this was fun. :D
