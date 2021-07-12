@@ -148,9 +148,12 @@ The code model for generating paths is described in detail. This can be part of 
 
 The main code consist of 4 parts:
 
-1. **process sensory data**; in the first part, the car processes the sensory data it recieves. This parts analyses the sensory input and sets the appropriate flags (car in front, left lane available, etc).
-2. **behaviour**; in the behaviour part, the car makes a decision on it's actions. if it wants to adjust it's speed or change a lane
-3. **trajectory**; now that an decision is made, the car plans a trajectory for it's action. This means it determines it path it want to follow
-4. **path planner**; in the last part the desired trajectory is translated to an spline in real world coordinates so the car follows the lane (curvature) and doesn't jerk the car.
+1. **process sensory data**; in the first part, the car processes the sensory data it recieves. This parts analyses the sensory input and sets the appropriate flags (car in front, left lane available, etc). In this part the controller loops over it's sensory input and recieves from each other car it's x,y position as well as it's s,d frenet positions. From this data the controller determines the speed and distance from us to the other cars. Then the controller checks in which lane the car is driving with respect to our car. It incorporates the lane width (of 4 meter) and checks if the frenet `d` position of the other car is within the lane boundaries. If the car is in the same lane as our car, the controllor will copy it's speed and distance for the `behaviour` module, for futher processing. If the car is not in our lane, it will check if it's in the left or right lane (with respect to our car), and will flag (`left_lane_free`, `right_lane_free`) the lane as occupied accodingly. In the left and rightways check the controller doesn't only check the distance forwards, but also backwards, in order to ensure that the lane is available.
+
+2. **behaviour**; Now that the controller knows where all the other cars are (with respect to our car), it can choose an apporpriate behaviour. If there is a car in front of us, it will match it's speed. It will also check the flags (`left_lane_free`, `right_lane_free`) if there is a lane available. And if there is a lane available, the `behaviour` module will change the lane setting and update the speed.
+
+3. **trajectory**; now that an decision is made, the car plans a trajectory for it's action. This means it determines it path it want to follow. The new trajectory is generated starting from the last two points of the previous trajectory. In case the previous trajectory is not available, we fake the previous position by reversing on the same direction (yaw). Secondly we setup three target points respectively 30, 60 and 90 meters ahead of the car. 
+
+4. **path planner**; Based on these points the `path planner` module will generate a smooth trajectory using the spline library. To make the work easier for the spline calculation, the coordinates are transformed (shift and rotation) to local car coordinates. It will generate points for the spline with an 0.02 second time interval between points. 
 
 this was fun. :D
